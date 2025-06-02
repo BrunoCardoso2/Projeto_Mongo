@@ -1,6 +1,6 @@
 package com.example.demo.Controller;
 import org.springframework.web.bind.annotation.*;
-import com.example.Model.Musica;
+import com.example.demo.Model.*;
 import com.example.demo.Repository.MusicaRepository;
 import java.util.List;
 import java.util.Optional;
