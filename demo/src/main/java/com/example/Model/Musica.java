@@ -1,11 +1,11 @@
 package com.example.Model;
-
 import java.util.List;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
 
 @Document(collection = "musicas")
+@Data
 public class Musica {
     @Id
     private String id;
@@ -16,3 +16,4 @@ public class Musica {
     private List<String> tags;
     private List<Integer> avaliacoes;
 }
+ 
