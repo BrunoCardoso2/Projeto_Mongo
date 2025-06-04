@@ -10,6 +10,7 @@ public class Usuario {
     @Id
     private String id;
     private String nome;
+    private String senha;
     private List<String> preferencias;
     private List<String> historico;
 }

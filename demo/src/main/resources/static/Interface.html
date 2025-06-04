@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Recomendador de Músicas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .box {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #000;
+            text-align: center;
+            width: 300px;
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00b894;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #019875;
+        }
+
+        #loginForm,
+        #cadastroForm {
+            display: none;
+        }
+
+        #loginForm.visible,
+        #cadastroForm.visible {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <!-- Login -->
+        <div id="loginForm" class="visible">
+            <h2>Login</h2>
+            <input type="text" id="nomeLogin" placeholder="Nome de usuário" />
+            <input type="password" id="senhaLogin" placeholder="Senha" />
+            <br />
+            <button onclick="login()">Entrar</button>
+            <br />
+            <button onclick="mostrarCadastro()">Cadastrar-se</button>
+        </div>
+
+        <!-- Cadastro -->
+        <div id="cadastroForm">
+            <h3>Cadastro</h3>
+            <input type="text" id="cadNome" placeholder="Nome de usuário" />
+            <input type="password" id="cadSenha" placeholder="Senha" />
+            <button onclick="cadastrar()">Cadastrar</button>
+            <br />
+            <button onclick="mostrarLogin()">Voltar para Login</button>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            const nome = document.getElementById('nomeLogin').value;
+            const senha = document.getElementById('senhaLogin').value;
+
+            fetch('http://localhost:8080/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, senha })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Login bem-sucedido!');
+                        window.location.href = "principal.html";
+                    } else {
+                        alert('Login falhou');
+                    }
+                })
+                .catch(error => {
+                    alert('Erro ao conectar com a API');
+                    console.error(error);
+                });
+        }
+
+        function mostrarCadastro() {
+            document.getElementById('loginForm').classList.remove('visible');
+            document.getElementById('cadastroForm').classList.add('visible');
+        }
+
+        function mostrarLogin() {
+            document.getElementById('cadastroForm').classList.remove('visible');
+            document.getElementById('loginForm').classList.add('visible');
+        }
+
+        function cadastrar() {
+            const nome = document.getElementById('cadNome').value;
+            const senha = document.getElementById('cadSenha').value;
+
+            fetch('http://localhost:8080/usuarios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, senha })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Cadastro realizado com sucesso!');
+                        mostrarLogin();
+                    } else {
+                        alert('Erro ao cadastrar');
+                    }
+                })
+                .catch(error => {
+                    alert('Erro na requisição');
+                    console.error(error);
+                });
+        }
+    </script>
+</body>
+
+</html>
