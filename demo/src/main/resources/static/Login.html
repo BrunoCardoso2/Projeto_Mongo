@@ -76,9 +76,9 @@
         <!-- Cadastro -->
         <div id="cadastroForm">
             <h3>Cadastro</h3>
-            <input type="text" id="cadNome" placeholder="Nome de usuário" />
-            <input type="password" id="cadSenha" placeholder="Senha" />
-            <button onclick="cadastrar()">Cadastrar</button>
+            <input type="text" id="cadastro-nome" placeholder="Nome de usuário" />
+            <input type="password" id="cadastro-senha" placeholder="Senha" />
+            <button onclick="cadastrarUsuario()">Cadastrar</button>
             <br />
             <button onclick="mostrarLogin()">Voltar para Login</button>
         </div>
@@ -89,15 +89,14 @@
             const nome = document.getElementById('nomeLogin').value;
             const senha = document.getElementById('senhaLogin').value;
 
-            fetch('http://localhost:8080/login', {
+            fetch('http://localhost:8080/usuarios/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nome, senha })
             })
                 .then(response => {
                     if (response.ok) {
-                        alert('Login bem-sucedido!');
-                        window.location.href = "principal.html";
+                        window.location.href = "Principal.html";
                     } else {
                         alert('Login falhou');
                     }
@@ -107,6 +106,24 @@
                     console.error(error);
                 });
         }
+        async function cadastrarUsuario() {
+            const nome = document.getElementById("cadastro-nome").value;
+            const senha = document.getElementById("cadastro-senha").value;
+
+            const response = await fetch("http://localhost:8080/usuarios/cadastrar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nome, senha }),
+            });
+
+            if (response.ok) {
+                alert("Cadastro realizado com sucesso!");
+                mostrarLogin(); // volta para tela de login
+            } else {
+                alert("Erro ao cadastrar.");
+            }
+        }
+
 
         function mostrarCadastro() {
             document.getElementById('loginForm').classList.remove('visible');
@@ -118,28 +135,7 @@
             document.getElementById('loginForm').classList.add('visible');
         }
 
-        function cadastrar() {
-            const nome = document.getElementById('cadNome').value;
-            const senha = document.getElementById('cadSenha').value;
 
-            fetch('http://localhost:8080/usuarios', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, senha })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Cadastro realizado com sucesso!');
-                        mostrarLogin();
-                    } else {
-                        alert('Erro ao cadastrar');
-                    }
-                })
-                .catch(error => {
-                    alert('Erro na requisição');
-                    console.error(error);
-                });
-        }
     </script>
 </body>
 

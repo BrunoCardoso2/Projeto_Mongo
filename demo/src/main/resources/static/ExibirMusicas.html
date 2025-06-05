@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lista de Músicas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            background: #f2f2f2;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .titulo {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .artista {
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Músicas</h1>
+    <ul id="lista-musicas"></ul>
+
+    <script>
+        async function carregarMusicas() {
+            try {
+                const resposta = await fetch('http://localhost:8080/musicas');
+                if (!resposta.ok) {
+                    throw new Error('Erro ao buscar músicas');
+                }
+                const musicas = await resposta.json();
+                const lista = document.getElementById('lista-musicas');
+                lista.innerHTML = ''; // limpa lista antes de inserir
+
+                if (musicas.length === 0) {
+                    lista.innerHTML = '<li>Nenhuma música encontrada.</li>';
+                    return;
+                }
+
+                musicas.forEach(musica => {
+                    // Supondo que o objeto musica tenha propriedades como titulo e artista
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="titulo">${musica.titulo || 'Sem título'}</div>
+                        <div class="artista">${musica.artista || 'Artista desconhecido'}</div>
+                    `;
+                    lista.appendChild(li);
+                });
+            } catch (erro) {
+                console.error(erro);
+                const lista = document.getElementById('lista-musicas');
+                lista.innerHTML = `<li>Erro ao carregar músicas.</li>`;
+            }
+        }
+
+        carregarMusicas();
+    </script>
+</body>
+
+</html>
