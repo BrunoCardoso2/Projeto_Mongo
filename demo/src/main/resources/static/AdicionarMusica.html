@@ -111,15 +111,17 @@
         <label for="artista">Artista:</label>
         <input type="text" id="artista" name="artista" required />
 
-        <label>Gêneros:</label>
-        <div class="checkbox-group">
-            <label><input type="checkbox" name="genero" value="Rock"> Rock</label>
-            <label><input type="checkbox" name="genero" value="Pop"> Pop</label>
-            <label><input type="checkbox" name="genero" value="Jazz"> Jazz</label>
-            <label><input type="checkbox" name="genero" value="MPB"> MPB</label>
-            <label><input type="checkbox" name="genero" value="Sertanejo"> Sertanejo</label>
-            <label><input type="checkbox" name="genero" value="Eletrônica"> Eletrônica</label>
-        </div>
+        <label for="genero">Gênero:</label>
+        <select id="genero" name="genero" required>
+            <option value="">Selecione um gênero</option>
+            <option value="Rock">Rock</option>
+            <option value="Pop">Pop</option>
+            <option value="Jazz">Jazz</option>
+            <option value="MPB">MPB</option>
+            <option value="Sertanejo">Sertanejo</option>
+            <option value="Eletrônica">Eletrônica</option>
+        </select>
+
 
         <button type="submit">Adicionar</button>
 
@@ -143,8 +145,8 @@
 
                 musicas.forEach(musica => {
                     const li = document.createElement('li');
-                    const generos = (musica.generos || []).join(', ');
-                    li.textContent = `${musica.titulo || 'Sem título'} - ${musica.artista || 'Artista desconhecido'}${generos ? ' (' + generos + ')' : ''}`;
+                    const genero = musica.genero || '';
+                    li.textContent = `${musica.titulo || 'Sem título'} - ${musica.artista || 'Artista desconhecido'}${genero ? ' (' + genero + ')' : ''}`;
                     lista.appendChild(li);
                 });
             } catch (erro) {
@@ -158,10 +160,10 @@
 
             const titulo = document.getElementById('titulo').value.trim();
             const artista = document.getElementById('artista').value.trim();
-            const checkboxes = document.querySelectorAll('input[name="genero"]:checked');
-            const generos = Array.from(checkboxes).map(cb => cb.value);
-
+            const generoSelecionado = document.getElementById('genero').value;
+            const generos = generoSelecionado ? [generoSelecionado] : [];
             const mensagem = document.getElementById('mensagem');
+
             mensagem.textContent = '';
             mensagem.className = 'mensagem';
 
@@ -171,7 +173,8 @@
                 return;
             }
 
-            const musica = { titulo, artista, generos };
+            const genero = generoSelecionado;
+            const musica = { titulo, artista, genero };
 
             try {
                 const response = await fetch('http://localhost:8080/musicas', {
