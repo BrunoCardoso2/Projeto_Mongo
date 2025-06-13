@@ -46,6 +46,10 @@
     <ul id="lista-musicas"></ul>
 
     <script>
+        const tipo = localStorage.getItem('tipoUsuario');
+        if (tipo !== 'usuario') {
+            window.location.href = "Login.html"; // ou outra página inicial
+        }
         async function carregarMusicas() {
             try {
                 const resposta = await fetch('http://localhost:8080/musicas');

@@ -65,20 +65,46 @@
         <!-- Login -->
         <div id="loginForm" class="visible">
             <h2>Login</h2>
+            <select id="tipoLogin">
+                <option value="usuario">Usuário</option>
+                <option value="artista">Artista</option>
+            </select>
             <input type="text" id="nomeLogin" placeholder="Nome de usuário" />
             <input type="password" id="senhaLogin" placeholder="Senha" />
             <br />
             <button onclick="login()">Entrar</button>
             <br />
-            <button onclick="mostrarCadastro()">Cadastrar-se</button>
+            <button onclick="mostrarCadastroUsuario()">Cadastrar como Usuário</button>
+            <button onclick="mostrarCadastroArtista()">Cadastrar como Artista</button>
         </div>
 
-        <!-- Cadastro -->
+        <!-- Cadastro usuário-->
         <div id="cadastroForm">
             <h3>Cadastro</h3>
             <input type="text" id="cadastro-nome" placeholder="Nome de usuário" />
             <input type="password" id="cadastro-senha" placeholder="Senha" />
+
+            <label>Gêneros favoritos:</label>
+            <div id="checkbox-generos" style="text-align: left; margin-bottom: 10px;">
+                <label><input type="checkbox" value="Rock"> Rock</label><br>
+                <label><input type="checkbox" value="Pop"> Pop</label><br>
+                <label><input type="checkbox" value="Jazz"> Jazz</label><br>
+                <label><input type="checkbox" value="MPB"> MPB</label><br>
+                <label><input type="checkbox" value="Sertanejo"> Sertanejo</label><br>
+                <label><input type="checkbox" value="Eletrônica"> Eletrônica</label><br>
+            </div>
+
             <button onclick="cadastrarUsuario()">Cadastrar</button>
+            <br />
+            <button onclick="mostrarLogin()">Voltar para Login</button>
+        </div>
+
+        <!-- Cadastro Artista-->
+        <div id="cadastroArtistaForm" style="display: none;">
+            <h3>Cadastro Artista</h3>
+            <input type="text" id="artista-nome" placeholder="Nome do artista" />
+            <input type="password" id="artista-senha" placeholder="Senha" />
+            <button onclick="cadastrarArtista()">Cadastrar</button>
             <br />
             <button onclick="mostrarLogin()">Voltar para Login</button>
         </div>
@@ -88,15 +114,28 @@
         function login() {
             const nome = document.getElementById('nomeLogin').value;
             const senha = document.getElementById('senhaLogin').value;
+            const tipo = document.getElementById('tipoLogin').value;
+            
 
-            fetch('http://localhost:8080/usuarios/login', {
+            const url = tipo === 'usuario'
+                ? 'http://localhost:8080/usuarios/login'
+                : 'http://localhost:8080/artistas/login';
+
+            fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nome, senha })
             })
                 .then(response => {
                     if (response.ok) {
-                        window.location.href = "Principal.html";
+                        // ⚠️ SALVA o tipo no localStorage
+                        localStorage.setItem('tipoUsuario', tipo);
+                        localStorage.setItem('nomeUsuario', nome);
+                        if (tipo === 'usuario') {
+                            window.location.href = "Principal.html";
+                        } else {
+                            window.location.href = "AdicionarMusica.html";
+                        }
                     } else {
                         alert('Login falhou');
                     }
@@ -106,19 +145,56 @@
                     console.error(error);
                 });
         }
-        async function cadastrarUsuario() {
-            const nome = document.getElementById("cadastro-nome").value;
-            const senha = document.getElementById("cadastro-senha").value;
 
-            const response = await fetch("http://localhost:8080/usuarios/cadastrar", {
+
+        function mostrarCadastroUsuario() {
+            document.getElementById('loginForm').classList.remove('visible');
+            document.getElementById('cadastroArtistaForm').style.display = 'none';
+            document.getElementById('cadastroForm').classList.add('visible');
+        }
+
+        function mostrarCadastroArtista() {
+            document.getElementById('loginForm').classList.remove('visible');
+            document.getElementById('cadastroForm').classList.remove('visible');
+            document.getElementById('cadastroArtistaForm').style.display = 'block';
+        }
+
+        async function cadastrarArtista() {
+            const nome = document.getElementById("artista-nome").value;
+            const senha = document.getElementById("artista-senha").value;
+
+            const response = await fetch("http://localhost:8080/artistas/cadastrar", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ nome, senha }),
             });
 
             if (response.ok) {
+                alert("Artista cadastrado com sucesso!");
+                mostrarLogin();
+            } else {
+                alert("Erro ao cadastrar artista.");
+            }
+        }
+
+        async function cadastrarUsuario() {
+            const nome = document.getElementById("cadastro-nome").value;
+            const senha = document.getElementById("cadastro-senha").value;
+
+            const checkboxes = document.querySelectorAll('#checkbox-generos input[type="checkbox"]');
+            const preferencias = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            const response = await fetch("http://localhost:8080/usuarios/cadastrar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nome, senha, preferencias }),
+            });
+
+            if (response.ok) {
                 alert("Cadastro realizado com sucesso!");
-                mostrarLogin(); // volta para tela de login
+                mostrarLogin();
             } else {
                 alert("Erro ao cadastrar.");
             }
@@ -132,7 +208,19 @@
 
         function mostrarLogin() {
             document.getElementById('cadastroForm').classList.remove('visible');
+            document.getElementById('cadastroArtistaForm').style.display = 'none';
             document.getElementById('loginForm').classList.add('visible');
+
+            // Limpar campos (opcional)
+            document.getElementById("artista-nome").value = "";
+            document.getElementById("artista-senha").value = "";
+            document.getElementById("cadastro-nome").value = "";
+            document.getElementById("cadastro-senha").value = "";
+            document.getElementById("nomeLogin").value = "";
+            document.getElementById("senhaLogin").value = "";
+
+            // Desmarca os checkboxes de gênero (opcional)
+            document.querySelectorAll('#checkbox-generos input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
 
 

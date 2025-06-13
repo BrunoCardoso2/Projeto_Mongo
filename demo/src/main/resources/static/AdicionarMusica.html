@@ -129,6 +129,10 @@
     </form>
 
     <script>
+        const tipo = localStorage.getItem('tipoUsuario');
+        if (tipo !== 'artista') {
+            window.location.href = "Login.html"; // ou outra página inicial
+        }
         async function listarMusicas() {
             try {
                 const response = await fetch('http://localhost:8080/musicas');

@@ -13,8 +13,6 @@ public class Musica {
     private String artista;
     private String genero;
 
-    //private int ano;
-    //private List<String> tags;
-    //private List<Integer> avaliacoes;
+  
 }
  
