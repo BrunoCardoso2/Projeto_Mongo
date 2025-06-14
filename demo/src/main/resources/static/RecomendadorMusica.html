@@ -70,6 +70,9 @@
     <button onclick="voltar()">Voltar</button>
 
     <script>
+        const nomeUsuario = localStorage.getItem('nomeUsuario');
+        console.log(nomeUsuario); // Adicione isto para verificar se vem algo
+
         const tipo = localStorage.getItem('tipoUsuario');
         if (tipo !== 'usuario') {
             window.location.href = "Login.html";
@@ -77,32 +80,33 @@
 
         async function carregarMusicas() {
             try {
-                const resposta = await fetch('http://localhost:8080/musicas');
+                const nomeUsuario = localStorage.getItem('nomeUsuario');
+                const resposta = await fetch(`http://localhost:8080/musicas/recomendadas/${nomeUsuario}`);
                 if (!resposta.ok) {
-                    throw new Error('Erro ao buscar músicas');
+                    throw new Error('Erro ao buscar músicas recomendadas');
                 }
                 const musicas = await resposta.json();
                 const lista = document.getElementById('lista-musicas');
                 lista.innerHTML = '';
 
                 if (musicas.length === 0) {
-                    lista.innerHTML = '<li>Nenhuma música encontrada.</li>';
+                    lista.innerHTML = '<li>Nenhuma música recomendada.</li>';
                     return;
                 }
 
                 musicas.forEach(musica => {
                     const li = document.createElement('li');
                     li.innerHTML = `
-            <div class="titulo">${musica.titulo || 'Sem título'}</div>
-            <div class="artista">Artista: ${musica.artista || 'Desconhecido'}</div>
-            <div class="artista">Gênero: ${musica.genero || 'Desconhecido'}</div>
-          `;
+                <div class="titulo">${musica.titulo || 'Sem título'}</div>
+                <div class="artista">Artista: ${musica.artista || 'Desconhecido'}</div>
+                <div class="artista">Gênero: ${musica.genero || 'Desconhecido'}</div>
+            `;
                     lista.appendChild(li);
                 });
             } catch (erro) {
                 console.error(erro);
                 const lista = document.getElementById('lista-musicas');
-                lista.innerHTML = `<li>Erro ao carregar músicas.</li>`;
+                lista.innerHTML = `<li>Erro ao carregar músicas recomendadas.</li>`;
             }
         }
 
