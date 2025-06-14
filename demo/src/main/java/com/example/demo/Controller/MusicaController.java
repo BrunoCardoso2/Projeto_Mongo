@@ -1,8 +1,14 @@
 package com.example.demo.Controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.example.demo.Model.*;
 import com.example.demo.Repository.MusicaRepository;
+import com.example.demo.Repository.UsuarioRepository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +18,8 @@ import java.util.Optional;
 public class MusicaController {
 
     private final MusicaRepository repository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public MusicaController(MusicaRepository repository) {
         this.repository = repository;
@@ -42,5 +50,18 @@ public class MusicaController {
     public void deletar(@PathVariable String id) {
         repository.deleteById(id);
     }
-    
+
+    @CrossOrigin(origins = "http://127.0.0.1:5500")
+    @GetMapping("/recomendadas/{nomeUsuario}")
+    public List<Musica> recomendarPorGenero(@PathVariable String nomeUsuario) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByNome(nomeUsuario);
+
+        if (usuarioOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        }
+
+        List<String> preferencias = usuarioOpt.get().getPreferencias();
+        return repository.findByGeneroIn(preferencias);
+    }
+
 }

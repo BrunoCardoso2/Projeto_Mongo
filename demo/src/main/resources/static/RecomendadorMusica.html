@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Recomendações de Músicas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: #fff;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #222;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px #000;
+        }
+
+        .titulo {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .artista, .genero {
+            font-size: 0.95em;
+            color: #ccc;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00b894;
+            color: white;
+            cursor: pointer;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background-color: #019875;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recomendações de Músicas</h1>
+    <ul id="lista-musicas">
+        <li>Carregando...</li>
+    </ul>
+    <button onclick="voltar()">Voltar ao Início</button>
+
+    <script>
+        const tipo = localStorage.getItem('tipoUsuario');
+        const nomeUsuario = localStorage.getItem('nomeUsuario');
+
+        if (tipo !== 'usuario') {
+            window.location.href = "Login.html";
+        }
+
+        async function carregarMusicas() {
+            try {
+                const resposta = await fetch(`http://localhost:8080/musicas/recomendadas/${nomeUsuario}`);
+                if (!resposta.ok) {
+                    throw new Error('Erro ao buscar músicas recomendadas');
+                }
+                const musicas = await resposta.json();
+                const lista = document.getElementById('lista-musicas');
+                lista.innerHTML = '';
+
+                if (musicas.length === 0) {
+                    lista.innerHTML = '<li>Nenhuma música recomendada.</li>';
+                    return;
+                }
+
+                musicas.forEach(musica => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="titulo">${musica.titulo || 'Sem título'}</div>
+                        <div class="artista">Artista: ${musica.artista || 'Desconhecido'}</div>
+                        <div class="genero">Gênero: ${musica.genero || 'Desconhecido'}</div>
+                    `;
+                    lista.appendChild(li);
+                });
+            } catch (erro) {
+                console.error(erro);
+                const lista = document.getElementById('lista-musicas');
+                lista.innerHTML = `<li>Erro ao carregar músicas.</li>`;
+            }
+        }
+
+        function voltar() {
+            window.location.href = "Principal.html"; // ou outra página desejada
+        }
+
+        carregarMusicas();
+    </script>
+</body>
+</html>

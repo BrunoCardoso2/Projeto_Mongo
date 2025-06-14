@@ -96,20 +96,14 @@
 </head>
 
 <body>
-
-    <h1>Gerenciador de Músicas</h1>
-
-    <ul id="lista-musicas">
-        <!-- músicas serão listadas aqui -->
-    </ul>
-
     <h2>Adicionar Música</h2>
     <form id="form-adicionar">
         <label for="titulo">Título:</label>
         <input type="text" id="titulo" name="titulo" required />
 
         <label for="artista">Artista:</label>
-        <input type="text" id="artista" name="artista" required />
+        <input type="text" id="artista" name="artista" readonly />
+
 
         <label for="genero">Gênero:</label>
         <select id="genero" name="genero" required>
@@ -127,8 +121,18 @@
 
         <div id="mensagem" class="mensagem"></div>
     </form>
+    <h1>Gerenciador de Músicas</h1>
+
+    <ul id="lista-musicas">
+        <!-- músicas serão listadas aqui -->
+    </ul>
+
+
 
     <script>
+        const nomeArtista = localStorage.getItem('nomeUsuario');
+        document.getElementById('artista').value = nomeArtista;
+
         const tipo = localStorage.getItem('tipoUsuario');
         if (tipo !== 'artista') {
             window.location.href = "Login.html"; // ou outra página inicial
@@ -150,7 +154,17 @@
                 musicas.forEach(musica => {
                     const li = document.createElement('li');
                     const genero = musica.genero || '';
-                    li.textContent = `${musica.titulo || 'Sem título'} - ${musica.artista || 'Artista desconhecido'}${genero ? ' (' + genero + ')' : ''}`;
+
+                    li.innerHTML = `
+        <strong>${musica.titulo || 'Sem título'}</strong> - 
+        ${musica.artista || 'Artista desconhecido'}
+        ${genero ? ' (' + genero + ')' : ''}
+        <button onclick="excluirMusica('${musica.id}')"
+            style="margin-left: 10px; background-color: #e74c3c; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+            Excluir
+        </button>
+    `;
+
                     lista.appendChild(li);
                 });
             } catch (erro) {
@@ -158,6 +172,25 @@
                 document.getElementById('lista-musicas').innerHTML = '<li>Erro ao carregar músicas.</li>';
             }
         }
+
+        async function excluirMusica(id) {
+            if (!confirm('Tem certeza que deseja excluir esta música?')) return;
+
+            try {
+                const response = await fetch(`http://localhost:8080/musicas/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Erro ao excluir música');
+
+                alert('Música excluída com sucesso!');
+                listarMusicas();
+            } catch (erro) {
+                console.error(erro);
+                alert('Erro ao excluir música.');
+            }
+        }
+
 
         async function adicionarMusica(event) {
             event.preventDefault();

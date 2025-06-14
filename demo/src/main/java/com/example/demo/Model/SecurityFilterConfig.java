@@ -16,7 +16,7 @@ public class SecurityFilterConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Desabilita CSRF para facilitar testes
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/usuarios/**", "/artistas/**", "/musicas").permitAll()
+                        .requestMatchers("/usuarios/**", "/artistas/**", "/musicas", "/musicas/recomendadas/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults()); // ou use formLogin se preferir
 
