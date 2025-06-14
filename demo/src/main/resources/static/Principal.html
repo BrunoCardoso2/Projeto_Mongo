@@ -15,27 +15,43 @@
 
         .container {
             display: flex;
+            justify-content: center;
+            gap: 60px;
+        }
+
+        .button-wrapper {
+            display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
         }
 
-        button {
-            padding: 15px 30px;
-            font-size: 16px;
-            background-color: #00b894;
+        .button-label {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .img-button {
+            background-color: #333;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
+            padding: 10px;
             cursor: pointer;
-            color: white;
+            transition: background-color 0.2s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        button:hover {
+        .img-button:hover {
             background-color: #019875;
+            transform: scale(1.05);
+        }
+
+        .img-button img {
+            width: 60px;
+            height: 60px;
         }
 
         h1 {
-            margin-bottom: 40px;
+            margin-bottom: 60px;
         }
     </style>
 </head>
@@ -43,42 +59,22 @@
 <body>
     <h1>Bem-vindo ao Recomendador de Músicas</h1>
     <div class="container">
-        <button onclick="window.location.href='RecomendadorMusica.html'">Recomendação de Musica</button>
-        <button onclick="window.location.href='ExibirMusicas.html'">Exibir Todas as Músicas</button>
+        <!-- Botão Recomendar -->
+        <div class="button-wrapper">
+            <div class="button-label">Recomendar</div>
+            <button class="img-button" onclick="window.location.href='RecomendadorMusica.html'">
+                <img src="https://cdn-icons-png.flaticon.com/512/32/32328.png" alt="Recomendação de Música">
+            </button>
+        </div>
+
+        <!-- Botão Todas as músicas -->
+        <div class="button-wrapper">
+            <div class="button-label">Todas as músicas</div>
+            <button class="img-button" onclick="window.location.href='ExibirMusicas.html'">
+                <img src="https://cdn1.iconfinder.com/data/icons/ios-11-glyphs/30/music_library-512.png">
+            </button>
+        </div>
     </div>
-
-    <script>
-        async function listarMusicas() {
-            try {
-                const response = await fetch('http://localhost:8080/musicas'); // endereço da sua API
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar músicas: ' + response.status);
-                }
-                const musicas = await response.json();
-
-                const lista = document.getElementById('lista-musicas');
-                lista.innerHTML = ''; // limpa lista antes de mostrar
-
-                if (musicas.length === 0) {
-                    lista.innerHTML = '<li>Nenhuma música encontrada.</li>';
-                    return;
-                }
-
-                musicas.forEach(musica => {
-                    const li = document.createElement('li');
-                    li.textContent = `${musica.titulo || 'Sem título'} - ${musica.artista || 'Artista desconhecido'}`;
-                    lista.appendChild(li);
-                });
-            } catch (erro) {
-                console.error('Erro:', erro);
-                const lista = document.getElementById('lista-musicas');
-                lista.innerHTML = `<li>Erro ao carregar músicas.</li>`;
-            }
-        }
-
-        // Chama a função para listar músicas quando a página carregar
-        window.onload = listarMusicas;
-    </script>
 </body>
 
 </html>

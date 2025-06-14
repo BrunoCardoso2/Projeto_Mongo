@@ -1,13 +1,17 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Recomendações de Músicas</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lista de Músicas</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #111;
             color: #fff;
+            max-width: 700px;
+            margin: 40px auto;
             padding: 20px;
         }
 
@@ -34,7 +38,7 @@
             font-weight: bold;
         }
 
-        .artista, .genero {
+        .artista {
             font-size: 0.95em;
             color: #ccc;
         }
@@ -57,44 +61,42 @@
         }
     </style>
 </head>
+
 <body>
-    <h1>Recomendações de Músicas</h1>
+    <h1>Músicas</h1>
     <ul id="lista-musicas">
         <li>Carregando...</li>
     </ul>
-    <button onclick="voltar()">Voltar ao Início</button>
-    <button onclick="carregarMusicas()">Atualizar Recomendações</button>
+    <button onclick="voltar()">Voltar</button>
 
     <script>
         const tipo = localStorage.getItem('tipoUsuario');
-        const nomeUsuario = localStorage.getItem('nomeUsuario');
-
         if (tipo !== 'usuario') {
             window.location.href = "Login.html";
         }
 
         async function carregarMusicas() {
             try {
-                const resposta = await fetch(`http://localhost:8080/musicas/recomendadas/${nomeUsuario}`);
+                const resposta = await fetch('http://localhost:8080/musicas');
                 if (!resposta.ok) {
-                    throw new Error('Erro ao buscar músicas recomendadas');
+                    throw new Error('Erro ao buscar músicas');
                 }
                 const musicas = await resposta.json();
                 const lista = document.getElementById('lista-musicas');
                 lista.innerHTML = '';
 
                 if (musicas.length === 0) {
-                    lista.innerHTML = '<li>Nenhuma música recomendada.</li>';
+                    lista.innerHTML = '<li>Nenhuma música encontrada.</li>';
                     return;
                 }
 
                 musicas.forEach(musica => {
                     const li = document.createElement('li');
                     li.innerHTML = `
-                        <div class="titulo">${musica.titulo || 'Sem título'}</div>
-                        <div class="artista">Artista: ${musica.artista || 'Desconhecido'}</div>
-                        <div class="genero">Gênero: ${musica.genero || 'Desconhecido'}</div>
-                    `;
+            <div class="titulo">${musica.titulo || 'Sem título'}</div>
+            <div class="artista">Artista: ${musica.artista || 'Desconhecido'}</div>
+            <div class="artista">Gênero: ${musica.genero || 'Desconhecido'}</div>
+          `;
                     lista.appendChild(li);
                 });
             } catch (erro) {
@@ -105,10 +107,11 @@
         }
 
         function voltar() {
-            window.location.href = "Principal.html"; // ou outra página desejada
+            window.location.href = "Principal.html";
         }
 
         carregarMusicas();
     </script>
 </body>
+
 </html>

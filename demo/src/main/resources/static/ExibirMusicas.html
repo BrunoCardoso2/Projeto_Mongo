@@ -8,48 +8,79 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
-            padding: 0 20px;
+            background-color: #111;
+            color: #fff;
+            padding: 15px;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
         }
 
         ul {
-            list-style-type: none;
-            padding-left: 0;
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
         li {
-            background: #f2f2f2;
-            margin-bottom: 10px;
-            padding: 15px;
+            background-color: #222;
+            margin: 8px 0;
+            padding: 10px 12px;
             border-radius: 6px;
+            box-shadow: 0 0 4px #000;
         }
 
         .titulo {
+            font-size: 1em;
             font-weight: bold;
-            font-size: 1.2em;
+            margin-bottom: 4px;
+            color: #fff;
         }
 
-        .artista {
-            color: #555;
+        .artista,
+        .genero {
+            font-size: 0.85em;
+            color: #ccc;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00b894;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background-color: #019875;
         }
     </style>
 </head>
 
 <body>
-    <h1>Músicas</h1>
-    <ul id="lista-musicas"></ul>
+    <h1>Todas as Músicas</h1>
+    <ul id="lista-musicas">
+        <li>Carregando...</li>
+    </ul>
+    <button onclick="voltar()">Voltar</button>
 
     <script>
         const tipo = localStorage.getItem('tipoUsuario');
         if (tipo !== 'usuario') {
-            window.location.href = "Login.html"; // ou outra página inicial
+            window.location.href = "Login.html";
         }
+
         async function carregarMusicas() {
             try {
                 const resposta = await fetch('http://localhost:8080/musicas');
@@ -58,7 +89,7 @@
                 }
                 const musicas = await resposta.json();
                 const lista = document.getElementById('lista-musicas');
-                lista.innerHTML = ''; // limpa lista antes de inserir
+                lista.innerHTML = '';
 
                 if (musicas.length === 0) {
                     lista.innerHTML = '<li>Nenhuma música encontrada.</li>';
@@ -66,12 +97,12 @@
                 }
 
                 musicas.forEach(musica => {
-                    // Supondo que o objeto musica tenha propriedades como titulo e artista
                     const li = document.createElement('li');
                     li.innerHTML = `
-                        <div class="titulo">${musica.titulo || 'Sem título'}</div>
-                        <div class="artista">${musica.artista || 'Artista desconhecido'}</div>
-                    `;
+            <div class="titulo">${musica.titulo || 'Sem título'}</div>
+            <div class="artista">Artista: ${musica.artista || 'Desconhecido'}</div>
+            <div class="genero">Gênero: ${musica.genero || 'Desconhecido'}</div>
+          `;
                     lista.appendChild(li);
                 });
             } catch (erro) {
@@ -79,6 +110,10 @@
                 const lista = document.getElementById('lista-musicas');
                 lista.innerHTML = `<li>Erro ao carregar músicas.</li>`;
             }
+        }
+
+        function voltar() {
+            window.location.href = "Principal.html";
         }
 
         carregarMusicas();

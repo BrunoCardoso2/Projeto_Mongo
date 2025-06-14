@@ -17,6 +17,27 @@
             flex-direction: column;
         }
 
+        input[type="text"],
+        input[type="password"] {
+            background-color: #333;
+            border: 2px solid #00b894   ;
+            border-radius: 6px;
+            padding: 12px 15px;
+            color: white;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #00b894;
+            /* verde mais claro no foco */
+            box-shadow: 0 0 8px #00b894;
+        }
+
         .box {
             background-color: #222;
             padding: 30px;
@@ -70,6 +91,58 @@
             -webkit-appearance: none;
             -moz-appearance: none;
         }
+
+        .checkbox-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 20px;
+            background-color: #1c1c1c;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            color: #019875;
+            /* verde escuro */
+            user-select: none;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            appearance: none;
+            background-color: #333;
+            border: 2px solid #019875;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .checkbox-container input[type="checkbox"]:checked {
+            background-color: #019875;
+            border-color: #019875;
+        }
+
+        .checkbox-container input[type="checkbox"]:checked::after {
+            content: "";
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
     </style>
 </head>
 
@@ -98,14 +171,16 @@
             <input type="password" id="cadastro-senha" placeholder="Senha" />
 
             <label>Gêneros favoritos:</label>
-            <div id="checkbox-generos" style="text-align: left; margin-bottom: 10px;">
-                <label><input type="checkbox" value="Rock"> Rock</label><br>
-                <label><input type="checkbox" value="Pop"> Pop</label><br>
-                <label><input type="checkbox" value="Jazz"> Jazz</label><br>
-                <label><input type="checkbox" value="MPB"> MPB</label><br>
-                <label><input type="checkbox" value="Sertanejo"> Sertanejo</label><br>
-                <label><input type="checkbox" value="Eletrônica"> Eletrônica</label><br>
+            <div id="checkbox-generos" class="checkbox-container">
+                <label><input type="checkbox" value="Rock"><span>Rock</span></label>
+                <label><input type="checkbox" value="Pop"><span>Pop</span></label>
+                <label><input type="checkbox" value="Jazz"><span>Jazz</span></label>
+                <label><input type="checkbox" value="MPB"><span>MPB</span></label>
+                <label><input type="checkbox" value="Sertanejo"><span>Sertanejo</span></label>
+                <label><input type="checkbox" value="Eletrônica"><span>Eletrônica</span></label>
+
             </div>
+
 
             <button onclick="cadastrarUsuario()">Cadastrar</button>
             <br />
