@@ -57,6 +57,19 @@
         #cadastroForm.visible {
             display: block;
         }
+
+        select#tipoLogin {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
     </style>
 </head>
 
@@ -115,7 +128,7 @@
             const nome = document.getElementById('nomeLogin').value;
             const senha = document.getElementById('senhaLogin').value;
             const tipo = document.getElementById('tipoLogin').value;
-            
+
 
             const url = tipo === 'usuario'
                 ? 'http://localhost:8080/usuarios/login'
@@ -196,7 +209,8 @@
                 alert("Cadastro realizado com sucesso!");
                 mostrarLogin();
             } else {
-                alert("Erro ao cadastrar.");
+                const erro = await response.text();
+                alert("Erro ao cadastrar ");
             }
         }
 

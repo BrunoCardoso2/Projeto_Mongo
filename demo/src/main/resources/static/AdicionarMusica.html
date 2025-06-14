@@ -34,6 +34,10 @@
             font-size: 1.1em;
             color: #222;
             box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         form {
@@ -50,23 +54,13 @@
             color: #555;
         }
 
-        input[type="text"] {
+        input[type="text"],
+        select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
             border-radius: 4px;
             border: 1px solid #ccc;
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .checkbox-group label {
-            font-weight: normal;
         }
 
         button {
@@ -104,7 +98,6 @@
         <label for="artista">Artista:</label>
         <input type="text" id="artista" name="artista" readonly />
 
-
         <label for="genero">Gênero:</label>
         <select id="genero" name="genero" required>
             <option value="">Selecione um gênero</option>
@@ -116,18 +109,12 @@
             <option value="Eletrônica">Eletrônica</option>
         </select>
 
-
         <button type="submit">Adicionar</button>
-
         <div id="mensagem" class="mensagem"></div>
     </form>
+
     <h1>Gerenciador de Músicas</h1>
-
-    <ul id="lista-musicas">
-        <!-- músicas serão listadas aqui -->
-    </ul>
-
-
+    <ul id="lista-musicas"></ul>
 
     <script>
         const nomeArtista = localStorage.getItem('nomeUsuario');
@@ -135,11 +122,16 @@
 
         const tipo = localStorage.getItem('tipoUsuario');
         if (tipo !== 'artista') {
-            window.location.href = "Login.html"; // ou outra página inicial
+            window.location.href = "Login.html";
         }
+
+        let modoAtualizacao = false;
+        let musicaAtualizandoId = null;
+
         async function listarMusicas() {
             try {
-                const response = await fetch('http://localhost:8080/musicas');
+                const response = await fetch(`http://localhost:8080/musicas/por-artista/${nomeArtista}`);
+
                 if (!response.ok) throw new Error('Erro ao buscar músicas');
                 const musicas = await response.json();
 
@@ -156,14 +148,22 @@
                     const genero = musica.genero || '';
 
                     li.innerHTML = `
-        <strong>${musica.titulo || 'Sem título'}</strong> - 
-        ${musica.artista || 'Artista desconhecido'}
-        ${genero ? ' (' + genero + ')' : ''}
-        <button onclick="excluirMusica('${musica.id}')"
-            style="margin-left: 10px; background-color: #e74c3c; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
-            Excluir
-        </button>
-    `;
+            <span>
+              <strong>${musica.titulo || 'Sem título'}</strong> - 
+              ${musica.artista || 'Artista desconhecido'}
+              ${genero ? ' (' + genero + ')' : ''}
+            </span>
+            <div style="display: flex; gap: 8px;">
+              <button onclick="prepararAtualizacao('${musica.id}', '${musica.titulo}', '${musica.genero}')"
+                style="background-color: #3498db; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                Atualizar
+              </button>
+              <button onclick="excluirMusica('${musica.id}')"
+                style="background-color: #e74c3c; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                Excluir
+              </button>
+            </div>
+          `;
 
                     lista.appendChild(li);
                 });
@@ -171,6 +171,16 @@
                 console.error('Erro:', erro);
                 document.getElementById('lista-musicas').innerHTML = '<li>Erro ao carregar músicas.</li>';
             }
+        }
+
+        function prepararAtualizacao(id, titulo, genero) {
+            document.getElementById('titulo').value = titulo;
+            document.getElementById('genero').value = genero;
+            musicaAtualizandoId = id;
+            modoAtualizacao = true;
+
+            const botao = document.querySelector('#form-adicionar button[type="submit"]');
+            botao.textContent = 'Atualizar';
         }
 
         async function excluirMusica(id) {
@@ -191,14 +201,12 @@
             }
         }
 
-
         async function adicionarMusica(event) {
             event.preventDefault();
 
             const titulo = document.getElementById('titulo').value.trim();
             const artista = document.getElementById('artista').value.trim();
             const generoSelecionado = document.getElementById('genero').value;
-            const generos = generoSelecionado ? [generoSelecionado] : [];
             const mensagem = document.getElementById('mensagem');
 
             mensagem.textContent = '';
@@ -213,25 +221,38 @@
             const genero = generoSelecionado;
             const musica = { titulo, artista, genero };
 
+            const url = modoAtualizacao
+                ? `http://localhost:8080/musicas/${musicaAtualizandoId}`
+                : 'http://localhost:8080/musicas';
+
+            const metodo = modoAtualizacao ? 'PUT' : 'POST';
+
             try {
-                const response = await fetch('http://localhost:8080/musicas', {
-                    method: 'POST',
+                const response = await fetch(url, {
+                    method: metodo,
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(musica)
                 });
 
-                if (!response.ok) throw new Error('Erro ao adicionar música');
+                if (!response.ok) throw new Error('Erro ao salvar música');
 
-                mensagem.textContent = 'Música adicionada com sucesso!';
+                mensagem.textContent = modoAtualizacao ? 'Música atualizada com sucesso!' : 'Música adicionada com sucesso!';
                 mensagem.classList.add('sucesso');
+
                 document.getElementById('form-adicionar').reset();
+                document.getElementById('artista').value = nomeArtista; 
                 listarMusicas();
 
+
+                // Resetar modo atualização
+                modoAtualizacao = false;
+                musicaAtualizandoId = null;
+                document.querySelector('#form-adicionar button[type="submit"]').textContent = 'Adicionar';
             } catch (erro) {
                 console.error(erro);
-                mensagem.textContent = 'Erro ao adicionar música.';
+                mensagem.textContent = 'Erro ao salvar música.';
                 mensagem.classList.add('erro');
             }
         }
@@ -239,7 +260,6 @@
         document.getElementById('form-adicionar').addEventListener('submit', adicionarMusica);
         window.onload = listarMusicas;
     </script>
-
 </body>
 
 </html>

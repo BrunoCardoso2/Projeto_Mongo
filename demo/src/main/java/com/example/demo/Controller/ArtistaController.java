@@ -28,6 +28,10 @@ public class ArtistaController {
 
     @PostMapping("/cadastrar")
     public Artista cadastrar(@RequestBody Artista artista) {
+        if (artistaRepository.findByNome(artista.getNome()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome de artista já está em uso");
+        }
+
         artista.setSenha(passwordEncoder.encode(artista.getSenha()));
         return artistaRepository.save(artista);
     }

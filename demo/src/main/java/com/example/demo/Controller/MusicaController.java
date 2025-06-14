@@ -9,6 +9,7 @@ import com.example.demo.Model.*;
 import com.example.demo.Repository.MusicaRepository;
 import com.example.demo.Repository.UsuarioRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,6 @@ public class MusicaController {
         repository.deleteById(id);
     }
 
-    @CrossOrigin(origins = "http://127.0.0.1:5500")
     @GetMapping("/recomendadas/{nomeUsuario}")
     public List<Musica> recomendarPorGenero(@PathVariable String nomeUsuario) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByNome(nomeUsuario);
@@ -61,7 +61,15 @@ public class MusicaController {
         }
 
         List<String> preferencias = usuarioOpt.get().getPreferencias();
-        return repository.findByGeneroIn(preferencias);
+        List<Musica> musicas = repository.findByGeneroIn(preferencias);
+
+        Collections.shuffle(musicas); // embaralha a lista
+        return musicas.stream().limit(5).toList(); // retorna no máximo 5
+    }
+
+    @GetMapping("/por-artista/{nome}")
+    public List<Musica> listarPorArtista(@PathVariable String nome) {
+        return repository.findByArtista(nome);
     }
 
 }

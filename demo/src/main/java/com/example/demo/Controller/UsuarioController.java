@@ -24,19 +24,22 @@ public class UsuarioController {
 
     @PostMapping("/cadastrar")
     public Usuario cadastrar(@RequestBody Usuario usuario) {
-        // Criptografa a senha antes de salvar
+        if (usuarioRepository.findByNome(usuario.getNome()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome de usuário já está em uso");
+        }
+
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         return usuarioRepository.save(usuario);
     }
 
     @PostMapping("/login")
-public Usuario login(@RequestBody Usuario loginData) {
-    Optional<Usuario> usuarioOpt = usuarioRepository.findByNome(loginData.getNome());
+    public Usuario login(@RequestBody Usuario loginData) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByNome(loginData.getNome());
 
-    if (usuarioOpt.isPresent() && passwordEncoder.matches(loginData.getSenha(), usuarioOpt.get().getSenha())) {
-        return usuarioOpt.get();
+        if (usuarioOpt.isPresent() && passwordEncoder.matches(loginData.getSenha(), usuarioOpt.get().getSenha())) {
+            return usuarioOpt.get();
+        }
+
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nome ou senha inválidos");
     }
-
-    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nome ou senha inválidos");
-}
 }
