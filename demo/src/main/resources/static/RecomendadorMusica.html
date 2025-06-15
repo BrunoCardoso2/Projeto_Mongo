@@ -63,11 +63,16 @@
 </head>
 
 <body>
+    <button onclick="logout()" style="position: fixed; top: 10px; right: 10px;">Sair</button>
+
     <h1>Músicas</h1>
     <ul id="lista-musicas">
         <li>Carregando...</li>
     </ul>
-    <button onclick="voltar()">Voltar</button>
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button onclick="voltar()">Voltar</button>
+        <button onclick="carregarMusicas()">Atualizar Recomendação</button>
+    </div>
 
     <script>
         const nomeUsuario = localStorage.getItem('nomeUsuario');
@@ -115,6 +120,13 @@
         }
 
         carregarMusicas();
+
+        function logout() {
+            localStorage.removeItem('nomeUsuario');
+            localStorage.removeItem('tipoUsuario');
+            window.location.href = "Login.html";
+        }
+
     </script>
 </body>
 

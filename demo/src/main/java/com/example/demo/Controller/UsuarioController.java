@@ -1,8 +1,11 @@
 package com.example.demo.Controller;
 
+import com.example.demo.Model.LogAcesso;
 import com.example.demo.Model.Usuario;
+import com.example.demo.Repository.LogAcessoRepository;
 import com.example.demo.Repository.UsuarioRepository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,9 @@ public class UsuarioController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private LogAcessoRepository logAcessoRepository;
+
     @PostMapping("/cadastrar")
     public Usuario cadastrar(@RequestBody Usuario usuario) {
         if (usuarioRepository.findByNome(usuario.getNome()).isPresent()) {
@@ -37,9 +43,15 @@ public class UsuarioController {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByNome(loginData.getNome());
 
         if (usuarioOpt.isPresent() && passwordEncoder.matches(loginData.getSenha(), usuarioOpt.get().getSenha())) {
+            // Log de sucesso
+            logAcessoRepository
+                    .save(new LogAcesso(null, loginData.getNome(), "usuario", LocalDateTime.now(), "LOGIN_SUCESSO"));
             return usuarioOpt.get();
         }
 
+        // Log de falha
+        logAcessoRepository
+                .save(new LogAcesso(null, loginData.getNome(), "usuario", LocalDateTime.now(), "LOGIN_FALHA"));
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nome ou senha inválidos");
     }
 }

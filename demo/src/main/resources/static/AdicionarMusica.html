@@ -117,6 +117,8 @@
 </head>
 
 <body>
+    <button onclick="logout()" style="position: fixed; top: 10px; right: 10px;">Sair</button>
+
     <h2>Adicionar Música</h2>
     <form id="form-adicionar">
         <label for="titulo">Título:</label>
@@ -154,6 +156,12 @@
 
         let modoAtualizacao = false;
         let musicaAtualizandoId = null;
+
+        function logout() {
+            localStorage.removeItem('nomeUsuario');
+            localStorage.removeItem('tipoUsuario');
+            window.location.href = "Login.html";
+        }
 
         async function listarMusicas() {
             try {
